@@ -19,12 +19,6 @@ long previousMillis = 0;        // will store last time Temp was updated
 byte second, minute, hour, dayOfWeek, dayOfMonth, month, year;
 byte test; 
 
-void dateSetup(void) {
-  Wire.begin();
-  tm1637.set(BRIGHT_TYPICAL);//BRIGHT_TYPICAL = 2,BRIGHT_DARKEST = 0,BRIGHTEST = 7;
-  tm1637.init();
-}
-
 // Convert normal decimal numbers to binary coded decimal
 byte decToBcd(byte val)
 {
@@ -83,7 +77,20 @@ void getDateDs1307()
   dayOfMonth = bcdToDec(Wire.read());
   month      = bcdToDec(Wire.read());
   year       = bcdToDec(Wire.read());
+  
+  Now = String(year);
+  Now = Now + month / 10;
+  Now = Now + month % 10;
+  Now = Now + dayOfMonth / 10;
+  Now = Now + dayOfMonth % 10;
+  Now = Now + hour / 10;
+  Now = Now + hour % 10;
+  Now = Now + minute / 10;
+  Now = Now + minute % 10;
+  Now = Now + second / 10;
+  Now = Now + second % 10;
 
+#ifdef DEBUG
   Serial.print(hour, DEC);
   Serial.print(":");
   Serial.print(minute, DEC);
@@ -96,11 +103,20 @@ void getDateDs1307()
   Serial.print("/");
   Serial.print(year, DEC);
   Serial.print("\n");
+#endif
 
   TimeDisp[0] = hour / 10;
   TimeDisp[1] = hour % 10;
   TimeDisp[2] = minute / 10;
   TimeDisp[3] = minute % 10;
+}
+
+void dateSetup(void) {
+  Wire.begin();
+  tm1637.set(BRIGHT_TYPICAL);//BRIGHT_TYPICAL = 2,BRIGHT_DARKEST = 0,BRIGHTEST = 7;
+  tm1637.init();
+  getDateDs1307();
+  Serial.println("Now, timer is ready.. " + Now);
 }
 
 boolean isDisplay = true;
